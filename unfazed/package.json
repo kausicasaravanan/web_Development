@@ -1,0 +1,14 @@
+{
+  "name": "unfazed-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.26.1",
+  "scripts": {
+    "typecheck": "pnpm --filter @workspace/api-server run typecheck && pnpm --filter @workspace/unfazed-app run typecheck",
+    "build:api": "pnpm --filter @workspace/api-server run build",
+    "build:web": "PORT=5173 BASE_PATH=/ pnpm --filter @workspace/unfazed-app run build"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}

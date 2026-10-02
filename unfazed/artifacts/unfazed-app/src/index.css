@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+@theme inline {
+  --color-background: hsl(var(--background)); --color-foreground: hsl(var(--foreground)); --color-border: hsl(var(--border)); --color-input: hsl(var(--input)); --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card)); --color-card-foreground: hsl(var(--card-foreground)); --color-primary: hsl(var(--primary)); --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary)); --color-secondary-foreground: hsl(var(--secondary-foreground)); --color-muted: hsl(var(--muted)); --color-muted-foreground: hsl(var(--muted-foreground)); --color-accent: hsl(var(--accent)); --color-accent-foreground: hsl(var(--accent-foreground)); --color-destructive: hsl(var(--destructive)); --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --font-sans: var(--app-font-sans); --font-serif: var(--app-font-serif); --font-mono: var(--app-font-mono); --radius-sm: calc(var(--radius) - 4px); --radius-md: calc(var(--radius) - 2px); --radius-lg: var(--radius); --radius-xl: calc(var(--radius) + 4px);
+}
+:root {
+  --background: 42 35% 95%; --foreground: 162 23% 20%; --border: 36 23% 84%; --input: 36 23% 84%; --ring: 161 26% 38%;
+  --card: 42 40% 98%; --card-foreground: 162 23% 20%; --primary: 161 26% 34%; --primary-foreground: 42 35% 97%; --secondary: 39 35% 88%; --secondary-foreground: 162 23% 20%; --muted: 39 30% 90%; --muted-foreground: 158 9% 45%; --accent: 14 46% 71%; --accent-foreground: 162 23% 18%; --destructive: 4 62% 49%; --destructive-foreground: 0 0% 100%;
+  --app-font-sans: 'DM Sans', sans-serif; --app-font-serif: 'Instrument Serif', Georgia, serif; --app-font-mono: ui-monospace, monospace; --radius: 1rem; --shadow: 0 15px 45px rgba(47, 69, 57, .08);
+}
+.dark { --background: 162 25% 12%; --foreground: 42 35% 94%; --border: 162 15% 29%; --input: 162 15% 29%; --ring: 157 30% 54%; --card: 162 22% 16%; --card-foreground: 42 35% 94%; --primary: 157 30% 55%; --primary-foreground: 162 25% 12%; --secondary: 162 15% 25%; --secondary-foreground: 42 35% 94%; --muted: 162 15% 23%; --muted-foreground: 42 12% 70%; --accent: 14 42% 62%; --accent-foreground: 162 25% 12%; --destructive: 4 62% 49%; --destructive-foreground: 0 0% 100%; }
+@layer base { * { @apply border-border; } body { @apply font-sans antialiased bg-background text-foreground; margin:0; } button,input,textarea { font:inherit; } }
+:root { font-synthesis: none; }
+.serif { font-family: var(--app-font-serif); }
+.page-wrap { width:min(1120px,calc(100% - 48px)); margin-inline:auto; }
+.surface { background:hsl(var(--card)); border:1px solid hsl(var(--border)); box-shadow:var(--shadow); }
+.eyebrow { letter-spacing:.16em; text-transform:uppercase; font-size:11px; font-weight:700; color:hsl(var(--primary)); }
+.field { width:100%; border:1px solid hsl(var(--border)); border-radius:12px; background:hsl(var(--background)); padding:13px 15px; color:hsl(var(--foreground)); outline:none; transition:border-color .2s, box-shadow .2s; }
+.field:focus { border-color:hsl(var(--primary)); box-shadow:0 0 0 3px hsl(var(--primary)/.12); }
+.field::placeholder { color:hsl(var(--muted-foreground)/.75); }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:9px; border-radius:999px; padding:12px 20px; font-weight:600; transition:transform .2s,background .2s; cursor:pointer; }
+.btn:hover { transform:translateY(-1px); }.btn-primary { background:hsl(var(--primary)); color:hsl(var(--primary-foreground)); }.btn-primary:hover { background:hsl(161 29% 28%); }.btn-ghost { color:hsl(var(--foreground)); border:1px solid hsl(var(--border)); background:transparent; }.btn-ghost:hover { background:hsl(var(--secondary)); }
+@keyframes rise { from {opacity:0;transform:translateY(12px)} to {opacity:1;transform:translateY(0)} }
+.animate-rise { animation:rise .55s cubic-bezier(.2,.75,.25,1) both; }

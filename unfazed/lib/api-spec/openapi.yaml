@@ -1,0 +1,338 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Therapist account registration and sign-in
+  - name: therapists
+    description: Therapist profile management and public profiles
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /auth/register:
+    post:
+      operationId: registerTherapist
+      tags: [auth]
+      summary: Register a therapist account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TherapistRegistration"
+      responses:
+        "201":
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSession"
+        "400":
+          description: Invalid registration details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Email is already registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/login:
+    post:
+      operationId: loginTherapist
+      tags: [auth]
+      summary: Sign in to a therapist account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TherapistLogin"
+      responses:
+        "200":
+          description: Authenticated session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSession"
+        "401":
+          description: Email or password is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/logout:
+    post:
+      operationId: logoutTherapist
+      tags: [auth]
+      summary: End the current therapist session
+      responses:
+        "204":
+          description: Signed out
+  /auth/me:
+    get:
+      operationId: getCurrentTherapist
+      tags: [auth]
+      summary: Get the signed-in therapist
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Current therapist account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Therapist"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /therapists/me:
+    patch:
+      operationId: updateTherapistProfile
+      tags: [therapists]
+      summary: Update the signed-in therapist's public profile
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TherapistProfileUpdate"
+      responses:
+        "200":
+          description: Updated therapist profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Therapist"
+        "400":
+          description: Invalid profile details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Public link is already in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /therapists/{slug}:
+    get:
+      operationId: getPublicTherapistProfile
+      tags: [therapists]
+      summary: Get a therapist's public branded profile
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 48
+      responses:
+        "200":
+          description: Public therapist profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicTherapistProfile"
+        "404":
+          description: Public profile not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: unfazed_session
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    TherapistRegistration:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+      required: [name, email, password]
+    TherapistLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 1
+      required: [email, password]
+    TherapistProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        slug:
+          type: string
+          pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          minLength: 2
+          maxLength: 48
+        bio:
+          type: string
+          maxLength: 3000
+        specializations:
+          type: array
+          maxItems: 12
+          items:
+            type: string
+            minLength: 2
+            maxLength: 80
+        languages:
+          type: array
+          maxItems: 12
+          items:
+            type: string
+            minLength: 2
+            maxLength: 60
+        services:
+          type: array
+          maxItems: 12
+          items:
+            $ref: "#/components/schemas/TherapistServiceInput"
+    Therapist:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        slug:
+          type: string
+        bio:
+          type: string
+        specializations:
+          type: array
+          items:
+            type: string
+        languages:
+          type: array
+          items:
+            type: string
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/TherapistService"
+      required: [id, name, email, slug, bio, specializations, languages, services]
+    PublicTherapistProfile:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        bio:
+          type: string
+        specializations:
+          type: array
+          items:
+            type: string
+        languages:
+          type: array
+          items:
+            type: string
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/TherapistService"
+      required: [name, slug, bio, specializations, languages, services]
+    TherapistServiceInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 2
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+        durationMinutes:
+          type: integer
+          enum: [30, 45, 60, 90]
+        feeInr:
+          type: number
+          minimum: 0
+      required: [title, description, durationMinutes, feeInr]
+    TherapistService:
+      allOf:
+        - $ref: "#/components/schemas/TherapistServiceInput"
+        - type: object
+          properties:
+            id:
+              type: string
+          required: [id]
+    AuthSession:
+      type: object
+      properties:
+        therapist:
+          $ref: "#/components/schemas/Therapist"
+      required: [therapist]
+
